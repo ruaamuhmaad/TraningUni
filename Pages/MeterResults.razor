@@ -1,0 +1,152 @@
+﻿@page "/meter-results"
+@using BlazorAssiment.Models
+@using BlazorAssiment.Services
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@inject MeterStateService StateService
+
+<PageTitle>نتائج الاستعلام</PageTitle>
+
+<div class="container mt-4" dir="rtl">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="fw-bold text-primary">
+                    <i class="bi bi-file-text ms-2"></i>
+                    نتائج الاستعلام
+                </h2>
+                <button class="btn btn-outline-secondary" @onclick="HandleGoBack">
+                    <i class="bi bi-arrow-right ms-2"></i>
+                    رجوع
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (StateService.CurrentResponse != null && StateService.CurrentResponse.Success)
+    {
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow border-success animate-fade-in">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-check-circle ms-2"></i>
+                            بيانات العداد
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <tbody>
+                                    <tr>
+                                        <th width="30%"><i class="bi bi-person ms-2"></i> اسم العميل</th>
+                                        <td>@StateService.CurrentResponse.CustomerName</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="bi bi-lightning ms-2"></i> رقم العداد</th>
+                                        <td>@StateService.CurrentResponse.MeterNumber</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="bi bi-credit-card ms-2"></i> رقم الحساب</th>
+                                        <td>@StateService.CurrentResponse.AccountNumber</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="bi bi-file-text ms-2"></i> رقم المرجع</th>
+                                        <td>@StateService.CurrentResponse.QueryRef</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="bi bi-wallet2 ms-2"></i> الحساب المستخدم</th>
+                                        <td>@StateService.CurrentResponse.AccountUsed</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="bi bi-currency-shekel ms-2"></i> التعديلات</th>
+                                        <td class="text-danger fw-bold">@StateService.CurrentResponse.Adjustments.ToString("F2") ₪</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="bi bi-battery-charging ms-2"></i> مبلغ الشحن</th>
+                                        <td class="text-success fw-bold">@StateService.CurrentResponse.RechargeAmount.ToString("F2") ₪</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="bi bi-clock ms-2"></i> التاريخ والوقت</th>
+                                        <td>@StateService.CurrentResponse.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button class="btn btn-info btn-lg" @onclick="HandleViewAdjustments">
+                                <i class="bi bi-list-ul ms-2"></i>
+                                عرض تفاصيل التعديلات
+                            </button>
+                            <button class="btn btn-success btn-lg" @onclick="HandleGoToPayment">
+                                <i class="bi bi-credit-card ms-2"></i>
+                                متابعة الدفع
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle ms-2"></i>
+            لا توجد نتائج للعرض
+        </div>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (!AuthService.IsAuthenticated())
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        if (StateService.CurrentResponse == null)
+        {
+            NavigationManager.NavigateTo("/home");
+        }
+    }
+
+    private void HandleGoBack()
+    {
+        NavigationManager.NavigateTo("/home");
+    }
+
+    private void HandleViewAdjustments()
+    {
+        NavigationManager.NavigateTo("/meter-adjustments");
+    }
+
+    private void HandleGoToPayment()
+    {
+        NavigationManager.NavigateTo("/payment-confirmation");
+    }
+}
+
+<style>
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+    }
+</style>

@@ -1,5 +1,6 @@
 using BlazorAssiment.Data;
 using BlazorAssiment.Services;
+using BlazorAssiment.Validators;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -17,6 +18,10 @@ namespace BlazorAssiment
 
             builder.Services.AddSingleton<WeatherForecastService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+
+            builder.Services.AddScoped<IElectricMeterService, ElectricMeterService>();
+            builder.Services.AddScoped<MeterStateService>();
+            builder.Services.AddScoped<MeterQueryRequestValidator>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

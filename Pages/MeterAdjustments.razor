@@ -1,0 +1,132 @@
+﻿@page "/meter-adjustments"
+@using BlazorAssiment.Models
+@using BlazorAssiment.Services
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@inject MeterStateService StateService
+
+<PageTitle>تفاصيل التعديلات</PageTitle>
+
+<div class="container mt-4" dir="rtl">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="fw-bold text-primary">
+                    <i class="bi bi-list-ul ms-2"></i>
+                    تفاصيل التعديلات
+                </h2>
+                <button class="btn btn-outline-secondary" @onclick="HandleGoBack">
+                    <i class="bi bi-arrow-right ms-2"></i>
+                    رجوع
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (StateService.CurrentResponse?.AdjustmentsDetails != null && StateService.CurrentResponse.AdjustmentsDetails.Any())
+    {
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow animate-fade-in">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-receipt ms-2"></i>
+                            قائمة التعديلات والرسوم
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-4">
+                            <i class="bi bi-info-circle ms-2"></i>
+                            <strong>إجمالي التعديلات:</strong> @StateService.CurrentResponse.Adjustments.ToString("F2") ₪
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th width="50%">اسم التعديل</th>
+                                        <th width="25%">القيمة</th>
+                                        <th width="25%">المتبقي</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var detail in StateService.CurrentResponse.AdjustmentsDetails)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <i class="bi bi-tag ms-2"></i>
+                                                @detail.AdjustmentName
+                                            </td>
+                                            <td class="text-danger fw-bold">@detail.AdjustmentValue ₪</td>
+                                            <td class="text-muted">@detail.AdjustmentRemains ₪</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button class="btn btn-success btn-lg" @onclick="HandleGoToPayment">
+                                <i class="bi bi-credit-card ms-2"></i>
+                                متابعة الدفع
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle ms-2"></i>
+            لا توجد تعديلات
+        </div>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (!AuthService.IsAuthenticated())
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        if (StateService.CurrentResponse == null)
+        {
+            NavigationManager.NavigateTo("/home");
+        }
+    }
+
+    private void HandleGoBack()
+    {
+        NavigationManager.NavigateTo("/meter-results");
+    }
+
+    private void HandleGoToPayment()
+    {
+        NavigationManager.NavigateTo("/payment-confirmation");
+    }
+}
+
+<style>
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }</style>

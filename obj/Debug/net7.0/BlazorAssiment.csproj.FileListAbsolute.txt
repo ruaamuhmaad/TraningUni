@@ -32,3 +32,4 @@ C:\Users\ruaam\source\repos\BlazorAssiment\BlazorAssiment\obj\Debug\net7.0\rjims
 C:\Users\ruaam\source\repos\BlazorAssiment\BlazorAssiment\obj\Debug\net7.0\rjsmrazor.dswa.cache.json
 C:\Users\ruaam\source\repos\BlazorAssiment\BlazorAssiment\obj\Debug\net7.0\rjsmcshtml.dswa.cache.json
 C:\Users\ruaam\source\repos\BlazorAssiment\BlazorAssiment\obj\Debug\net7.0\staticwebassets.build.json.cache
+C:\Users\ruaam\source\repos\BlazorAssiment\BlazorAssiment\obj\Debug\net7.0\BlazorAssiment.sourcelink.json

@@ -48,6 +48,26 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/ruaam/source/repos/BlazorAssiment/BlazorAssiment/Pages/MeterAdjustments.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWV0ZXJBZGp1c3RtZW50cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ruaam/source/repos/BlazorAssiment/BlazorAssiment/Pages/MeterResults.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWV0ZXJSZXN1bHRzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ruaam/source/repos/BlazorAssiment/BlazorAssiment/Pages/MeterSearch.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWV0ZXJTZWFyY2gucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ruaam/source/repos/BlazorAssiment/BlazorAssiment/Pages/PaymentConfirmation.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudENvbmZpcm1hdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ruaam/source/repos/BlazorAssiment/BlazorAssiment/Pages/PaymentSuccess.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudFN1Y2Nlc3MucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/ruaam/source/repos/BlazorAssiment/BlazorAssiment/Shared/SurveyPrompt.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFN1cnZleVByb21wdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 

@@ -1,0 +1,178 @@
+﻿@page "/home"
+@using BlazorAssiment.Models
+@using BlazorAssiment.Services
+@using BlazorAssiment.Validators
+@inject IElectricMeterService MeterService
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@inject MeterStateService StateService
+
+<PageTitle>استعلام الفاتورة الكهربائية</PageTitle>
+
+<div class="container mt-4" dir="rtl">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold text-primary">
+                        <i class="bi bi-lightning-charge ms-2"></i>
+                        استعلام الفاتورة الكهربائية
+                    </h2>
+                    <p class="text-muted">مرحباً @AuthService.GetCurrentUser()?.Username</p>
+                </div>
+                <button class="btn btn-outline-danger" @onclick="HandleLogout">
+                    <i class="bi bi-box-arrow-right ms-2"></i>
+                    تسجيل خروج
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">
+                        <i class="bi bi-search ms-2"></i>
+                        بيانات الاستعلام
+                    </h5>
+
+                    <EditForm Model="@queryRequest" OnValidSubmit="@HandleQuery">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="meterNo" class="form-label fw-semibold">
+                                    <i class="bi bi-lightning ms-1"></i>
+                                    رقم العداد
+                                </label>
+                                <InputText id="meterNo"
+                                           class="form-control form-control-lg"
+                                           @bind-Value="queryRequest.MeterNo"
+                                           placeholder="أدخل 11 أو 13 رقم"
+                                           disabled="@isQuerying" />
+                                <small class="text-muted">مثال: 70004421111</small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="amount" class="form-label fw-semibold">
+                                    <i class="bi bi-cash ms-1"></i>
+                                    المبلغ (₪)
+                                </label>
+                                <InputNumber id="amount"
+                                             class="form-control form-control-lg"
+                                             @bind-Value="queryRequest.Amount"
+                                             placeholder="من 20 إلى 500"
+                                             disabled="@isQuerying" />
+                                <small class="text-muted">الحد الأدنى: 20 ₪ - الحد الأقصى: 500 ₪</small>
+                            </div>
+                        </div>
+
+                        @if (validationErrors.Count > 0)
+                        {
+                            <div class="alert alert-danger mt-3 animate-fade-in">
+                                <i class="bi bi-exclamation-triangle ms-2"></i>
+                                <strong>أخطاء في البيانات:</strong>
+                                <ul class="mb-0 mt-2">
+                                    @foreach (var error in validationErrors)
+                                    {
+                                        <li>@error</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg" disabled="@isQuerying">
+                                @if (isQuerying)
+                                {
+                                    <span class="spinner-border spinner-border-sm ms-2"></span>
+                                    <span>جارٍ الاستعلام...</span>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-search ms-2"></i>
+                                    <span>استعلام</span>
+                                }
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private MeterQueryRequest queryRequest = new();
+    private List<string> validationErrors = new();
+    private bool isQuerying = false;
+
+    protected override void OnInitialized()
+    {
+        if (!AuthService.IsAuthenticated())
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+
+    private async Task HandleQuery()
+    {
+        validationErrors.Clear();
+
+        var validator = new MeterQueryRequestValidator();
+        var validationResult = validator.Validate(queryRequest);
+
+        if (!validationResult.isValid)
+        {
+            validationErrors = validationResult.errors;
+            return;
+        }
+
+        isQuerying = true;
+        StateHasChanged();
+
+        try
+        {
+            var response = await MeterService.QueryMeterAsync(queryRequest);
+            StateService.CurrentRequest = queryRequest;
+            StateService.CurrentResponse = response;
+            NavigationManager.NavigateTo("/meter-results");
+        }
+        catch (Exception ex)
+        {
+            validationErrors.Add($"حدث خطأ: {ex.Message}");
+        }
+        finally
+        {
+            isQuerying = false;
+            StateHasChanged();
+        }
+    }
+
+    private void HandleLogout()
+    {
+        AuthService.Logout();
+        NavigationManager.NavigateTo("/login");
+    }
+}
+
+<style>
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .card {
+        border-radius: 10px;
+    }
+</style>
