@@ -1,0 +1,22 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@namespace BlazorAssiment.Pages
+
+<div class="d-flex vh-100 justify-content-center align-items-center">
+    <div class="text-center">
+        <h1 class="mb-3">Welcome to BlazorAssiment!</h1>
+        <p class="mb-4">This is the home page.</p>
+        <button class="btn btn-primary btn-lg" @onclick="GoToLogin">
+            Go to Login
+        </button>
+    </div>
+</div>
+
+@code {
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+
+    private void GoToLogin()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+}

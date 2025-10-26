@@ -1,0 +1,119 @@
+﻿@page "/otp"
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+
+<PageTitle>التحقق من رمز OTP</PageTitle>
+
+<div class="container mt-5" dir="rtl">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-lg p-4">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold text-primary">
+                        <i class="bi bi-shield-lock ms-2"></i> التحقق من رمز OTP
+                    </h3>
+                    <p class="text-muted">أدخل رمز التحقق المرسل إلى حسابك</p>
+                </div>
+
+                <EditForm Model="@otpModel" OnValidSubmit="@HandleOtp">
+                    <DataAnnotationsValidator />
+
+                    <div class="mb-3">
+                        <label for="otp" class="form-label fw-semibold">
+                            <i class="bi bi-key ms-1"></i> رمز التحقق (OTP)
+                        </label>
+                        <InputText id="otp"
+                                   class="form-control form-control-lg"
+                                   @bind-Value="otpModel.Otp"
+                                   placeholder="أدخل رمز التحقق"
+                                   disabled="@isLoading" />
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(message))
+                    {
+                        <div class="alert @(isSuccess ? "alert-success" : "alert-danger") animate-fade-in" role="alert">
+                            <i class="bi @(isSuccess ? "bi-check-circle" : "bi-exclamation-triangle") ms-2"></i>
+                            @message
+                        </div>
+                    }
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg" disabled="@isLoading">
+                            @if (isLoading)
+                            {
+                                <span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
+                                <span>جارٍ التحقق...</span>
+                            }
+                            else
+                            {
+                                <i class="bi bi-shield-check ms-2"></i>
+                                <span>تحقق</span>
+                            }
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private OtpModel otpModel = new();
+    private bool isLoading = false;
+    private string message = string.Empty;
+    private bool isSuccess = false;
+    private string username = string.Empty;
+
+    private class OtpModel
+    {
+        public string Otp { get; set; } = string.Empty;
+    }
+
+    protected override void OnInitialized()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+        if (query.TryGetValue("username", out var u)) username = u;
+    }
+
+    private async Task HandleOtp()
+    {
+        isLoading = true;
+        message = string.Empty;
+
+        var result = await AuthService.VerifyOtpAsync(username, otpModel.Otp);
+        isLoading = false;
+
+        if (result.success)
+        {
+            isSuccess = true;
+            message = result.message;
+            await Task.Delay(1000);
+            NavigationManager.NavigateTo("/home");
+        }
+        else
+        {
+            isSuccess = false;
+            message = result.message;
+        }
+    }
+}
+
+<style>
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
