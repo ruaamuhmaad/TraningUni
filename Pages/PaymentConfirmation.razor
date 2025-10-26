@@ -126,7 +126,7 @@
 
         if (StateService.CurrentRequest == null || StateService.CurrentResponse == null)
         {
-            // لو ما في بيانات، نرجع للصفحة الرئيسية للاستعلام
+           
             NavigationManager.NavigateTo("/home");
             return;
         }
@@ -134,7 +134,7 @@
 
     private async Task HandleProcessPayment()
     {
-        // حماية إضافية: تأكد من وجود البيانات
+        
         if (StateService.CurrentRequest == null)
         {
             processingError = "بيانات الطلب غير متوفرة.";
@@ -150,12 +150,11 @@
             var paymentResponse = await MeterService.ProcessPaymentAsync(StateService.CurrentRequest);
             StateService.CurrentPayment = paymentResponse;
 
-            // بعد نجاح الدفع ننتقل لصفحة النجاح
             NavigationManager.NavigateTo("/payment-success");
         }
         catch (Exception ex)
         {
-            // عرض رسالة الخطأ للمستخدم
+       
             processingError = ex.Message;
             isProcessing = false;
             StateHasChanged();
@@ -164,7 +163,7 @@
 
     private void HandleGoBack()
     {
-        // نرجع لصفحة نتائج الاستعلام (اسم المسار المستخدم في المشروع)
+     
         NavigationManager.NavigateTo("/meter-results");
     }
 }

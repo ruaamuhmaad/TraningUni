@@ -1,12 +1,11 @@
 ﻿using BlazorAssiment.Models;
 
-
-
 namespace BlazorAssiment.Services
 {
     public class AuthService : IAuthService
     {
         private User? _currentUser;
+        private string? _pendingUsername; 
 
         private readonly List<User> _users = new()
         {
@@ -44,40 +43,33 @@ namespace BlazorAssiment.Services
             string password,
             string? otp = null)
         {
-            await Task.Delay(500); 
+            await Task.Delay(500);
 
-            // Find user
             var user = _users.FirstOrDefault(u =>
                 u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
 
-            // Check if user exists
             if (user == null)
             {
                 return (false, "Invalid username or password", false);
             }
 
-            // Check password
             if (user.Password != password)
             {
                 return (false, "Invalid username or password", false);
             }
 
-            // Check if account is active
             if (!user.IsActive)
             {
                 return (false, "This account is inactive. Please contact the administrator.", false);
             }
 
-            // If OTP is enabled
             if (user.IsOtpEnabled)
             {
-                // If OTP not entered yet
                 if (string.IsNullOrEmpty(otp))
                 {
                     return (false, "Please enter your OTP code.", true);
                 }
 
-                // Validate OTP
                 if (otp != user.StaticOtp)
                 {
                     return (false, "Invalid OTP code.", true);
@@ -87,18 +79,32 @@ namespace BlazorAssiment.Services
             _currentUser = user;
             return (true, "Login successful!", false);
         }
-        private string? pendingUser;
 
         public Task SavePendingUserAsync(string username)
         {
-            pendingUser = username;
+            _pendingUsername = username;
             return Task.CompletedTask;
         }
 
         public Task<(bool success, string message)> VerifyOtpAsync(string username, string otp)
         {
-            if (username == "jane" && otp == "7890")
+        
+            var user = _users.FirstOrDefault(u =>
+                u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+
+            if (user == null)
+            {
+                return Task.FromResult((false, "User not found."));
+            }
+
+          
+            if (user.StaticOtp == otp)
+            {
+                
+                _currentUser = user;
+                _pendingUsername = null; 
                 return Task.FromResult((true, "OTP verified successfully!"));
+            }
 
             return Task.FromResult((false, "Invalid OTP, please try again."));
         }
@@ -112,6 +118,7 @@ namespace BlazorAssiment.Services
         public void Logout()
         {
             _currentUser = null;
+            _pendingUsername = null;
         }
 
         public bool IsAuthenticated()
@@ -125,4 +132,3 @@ namespace BlazorAssiment.Services
         }
     }
 }
-
